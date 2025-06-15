@@ -20,7 +20,7 @@ def format_bdt(amount):
 # App title
 st.title("Danish Salary Tax Calculator")
 
-# Function to parse integer inputs safely
+# Safe parsing functions
 def parse_int_input(value, default=0):
     try:
         ivalue = int(value)
@@ -30,18 +30,27 @@ def parse_int_input(value, default=0):
     except:
         return default
 
+def parse_float_input(value, default=0.0):
+    try:
+        fvalue = float(value)
+        if fvalue < 0:
+            return default
+        return fvalue
+    except:
+        return default
+
 # Inputs using text_input starting empty
 hours_input = st.text_input("Enter hours worked", "")
 minutes_input = st.text_input("Enter minutes worked", "")
+hourly_rate_input = st.text_input("Enter hourly wage (DKK)", "")
 
 hours = parse_int_input(hours_input)
 minutes = parse_int_input(minutes_input)
+hourly_rate = parse_float_input(hourly_rate_input)
 
 if minutes > 59:
     st.error("Minutes must be between 0 and 59.")
     minutes = 0
-
-hourly_rate = st.number_input("Enter hourly wage (DKK)", value=0.00, step=1.0)
 
 # Convert minutes to decimal hours
 total_hours = hours + (minutes / 60)
