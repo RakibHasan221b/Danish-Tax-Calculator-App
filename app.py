@@ -21,13 +21,18 @@ def format_bdt(amount):
 st.title("Danish Salary Tax Calculator")
 
 # Inputs
-hours = st.number_input("Enter hours worked", value=0.0, step=0.25)
+hours = st.number_input("Enter hours worked", value=0, step=1, format="%d")
+minutes = st.number_input("Enter minutes worked", value=0, step=1, max_value=59, format="%d")
 hourly_rate = st.number_input("Enter hourly wage (DKK)", value=135.00, step=1.0)
+
+# Convert minutes to decimal hours
+total_hours = hours + (minutes / 60)
+
 tax_deduction = 5207.00  # fixed monthly deduction
 atp_fixed = 66.00        # fixed ATP
 
 # Calculations
-gross_salary = round(hours * hourly_rate, 2)
+gross_salary = round(total_hours * hourly_rate, 2)
 
 # Deduct ATP but ensure salary after ATP is not negative
 salary_after_atp = max(0, gross_salary - atp_fixed)
