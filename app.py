@@ -75,14 +75,39 @@ total_tax = min(gross_salary, round(atp_fixed + am_bidrag + a_skat, 2))
 
 net_salary = round(gross_salary - total_tax, 2)
 
-# Display salary breakdown in DKK
+# Custom function to color the amounts in markdown
+def colored_text(amount, color):
+    return f'<p style="font-size:24px; font-weight:bold; color:{color}; margin:0;">{amount:,.2f} DKK</p>'
+
+# Display salary breakdown in columns with colors
 st.subheader("💰 Salary Breakdown (in DKK)")
-st.write(f"**Gross Earned:** {gross_salary} DKK")
-st.write(f"**Total Tax Paid:** {total_tax} DKK")
-st.write(f"– ATP: {atp_fixed} DKK")
-st.write(f"– AM-bidrag (8% on salary after ATP): {am_bidrag} DKK")
-st.write(f"– A-skat (38%): {a_skat} DKK")
-st.write(f"**Net Earned:** {net_salary} DKK")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("### Gross Earned")
+    st.markdown(colored_text(gross_salary, "#2E86C1"), unsafe_allow_html=True)  # Blue
+
+with col2:
+    st.markdown("### Total Tax Paid")
+    st.markdown(colored_text(total_tax, "#C0392B"), unsafe_allow_html=True)    # Red
+
+with col3:
+    st.markdown("### Net Earned")
+    st.markdown(colored_text(net_salary, "#27AE60"), unsafe_allow_html=True)    # Green
+
+st.write("---")  # Separator line
+
+col4, col5, col6 = st.columns(3)
+
+with col4:
+    st.write(f"– ATP: {atp_fixed} DKK")
+
+with col5:
+    st.write(f"– AM-bidrag (8% on salary after ATP): {am_bidrag} DKK")
+
+with col6:
+    st.write(f"– A-skat (38%): {a_skat} DKK")
 
 # Currency selection
 currency = st.selectbox("Choose currency to convert to:", ["BDT", "USD", "EUR"], index=0)
