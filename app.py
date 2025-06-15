@@ -18,7 +18,7 @@ def format_bdt(amount):
         return f"{amount:,.2f}"
 
 # App title
-st.title("Danish Payslip Tax Calculator")
+st.title("Danish Salary Tax Calculator")
 
 # Inputs
 hours = st.number_input("Enter hours worked", value=0.0, step=0.25)
