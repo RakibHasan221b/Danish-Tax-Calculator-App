@@ -23,7 +23,7 @@ st.title("Danish Salary Tax Calculator")
 # Inputs
 hours = st.number_input("Enter hours worked", value=0, step=1, format="%d")
 minutes = st.number_input("Enter minutes worked", value=0, step=1, max_value=59, format="%d")
-hourly_rate = st.number_input("Enter hourly wage (DKK)", value=135.00, step=1.0)
+hourly_rate = st.number_input("Enter hourly wage (DKK)", value=0.00, step=1.0)
 
 # Convert minutes to decimal hours
 total_hours = hours + (minutes / 60)
