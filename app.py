@@ -20,7 +20,7 @@ div.stButton > button:first-child:hover {
 """, unsafe_allow_html=True)
 
 
-# Set locale for BDT formatting (Bangladesh Numbering System)
+# Set locale for BDT formatting (Bangladesh Numbering Systems)
 try:
     locale.setlocale(locale.LC_ALL, 'en_IN.UTF-8')
 except locale.Error:
@@ -43,7 +43,7 @@ st.markdown(
         letter-spacing: 4px; 
         text-align: center; 
         margin-bottom: 30px;">
-        Min Løn
+        MinLøn
     </h1>
     """,
     unsafe_allow_html=True
