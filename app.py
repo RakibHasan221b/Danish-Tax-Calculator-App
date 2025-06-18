@@ -9,12 +9,9 @@ except locale.Error:
     locale.setlocale(locale.LC_ALL, '')  # fallback to system default
 
 def format_bdt(amount):
-    # Custom format for BDT (like 12,34,567.89)
-    # Python's locale for India gives similar formatting
     try:
         return locale.format_string("%0.2f", amount, grouping=True)
     except:
-        # fallback simple comma separator
         return f"{amount:,.2f}"
 
 # App title
@@ -39,143 +36,163 @@ def parse_float_input(value, default=0.0):
     except:
         return default
 
-# Inputs using text_input starting empty
+# Inputs
 hours_input = st.text_input("Enter hours worked", "")
 minutes_input = st.text_input("Enter minutes worked", "")
 hourly_rate_input = st.text_input("Enter hourly wage (DKK)", "")
+tax_deduction_input = st.text_input("Enter personal tax deduction amount", "")
+other_tax_percent_input = st.text_input("Other taxes (e.g., Church Tax) in %", "")
 
 hours = parse_int_input(hours_input)
 minutes = parse_int_input(minutes_input)
 hourly_rate = parse_float_input(hourly_rate_input)
+tax_deduction = parse_float_input(tax_deduction_input, default=None)
+
+if tax_deduction is None:
+    st.warning("Please enter your tax deduction amount")
+    st.stop()
+
+other_tax_percent = parse_float_input(other_tax_percent_input, default=None)
 
 if minutes > 59:
     st.error("Minutes must be between 0 and 59.")
     minutes = 0
 
-# Convert minutes to decimal hours
 total_hours = hours + (minutes / 60)
 
-tax_deduction = 5207.00  # fixed monthly deduction
-atp_fixed = 66.00        # fixed ATP
-
-# Calculations
+atp_fixed = 66.00
 gross_salary = round(total_hours * hourly_rate, 2)
-
-# Deduct ATP but ensure salary after ATP is not negative
 salary_after_atp = max(0, gross_salary - atp_fixed)
-
 am_bidrag = round(salary_after_atp * 0.08, 2)
-
 a_skat_base = max(0, salary_after_atp - am_bidrag - tax_deduction)
-
 a_skat = round(a_skat_base * 0.38, 2)
 
-# Total tax cannot exceed gross salary
 total_tax = min(gross_salary, round(atp_fixed + am_bidrag + a_skat, 2))
-
 net_salary = round(gross_salary - total_tax, 2)
 
-# Custom function to color the amounts in markdown
+# Calculate and deduct other tax if provided
+other_tax_amount = 0
+if other_tax_percent_input.strip():
+    other_tax_amount = round(net_salary * (other_tax_percent / 100), 2)
+    net_salary -= other_tax_amount
+
+# Custom function to color the amounts
 def colored_text(amount, color):
     return f'<p style="font-size:24px; font-weight:bold; color:{color}; margin:0;">{amount:,.2f} DKK</p>'
 
-# Display salary breakdown in columns with colors
 st.subheader("💰 Salary Breakdown (in DKK)")
 
 col1, col2, col3 = st.columns(3)
-
 with col1:
     st.markdown("### Gross Earned")
-    st.markdown(colored_text(gross_salary, "#2E86C1"), unsafe_allow_html=True)  # Blue
+    st.markdown(colored_text(gross_salary, "#2E86C1"), unsafe_allow_html=True)
 
 with col2:
     st.markdown("### Total Tax Paid")
-    st.markdown(colored_text(total_tax, "#C0392B"), unsafe_allow_html=True)    # Red
+    st.markdown(colored_text(total_tax + other_tax_amount, "#C0392B"), unsafe_allow_html=True)
 
 with col3:
     st.markdown("### Net Earned")
-    st.markdown(colored_text(net_salary, "#27AE60"), unsafe_allow_html=True)    # Green
+    st.markdown(colored_text(net_salary, "#27AE60"), unsafe_allow_html=True)
 
-st.write("---")  # Separator line
+st.write("---")
 
 col4, col5, col6 = st.columns(3)
-
 with col4:
     st.write(f"– ATP: {atp_fixed} DKK")
-
 with col5:
     st.write(f"– AM-bidrag (8% on salary after ATP): {am_bidrag} DKK")
-
 with col6:
     st.write(f"– A-skat (38%): {a_skat} DKK")
 
-# Currency selection
-currency = st.selectbox("Choose currency to convert to:", ["BDT", "USD", "EUR"], index=0)
+if other_tax_amount > 0:
+    st.write(f"– Other Tax (e.g., Church Tax @ {other_tax_percent}%): {other_tax_amount:.2f} DKK")
 
-# Fetch live exchange rates from CurrencyFreaks API
-API_KEY = "50c81616ae69471da10d264e01c474cc"
-url = f"https://api.currencyfreaks.com/latest?apikey={API_KEY}&symbols=BDT,DKK,USD,EUR"
+# Currency conversion checkbox
+enable_conversion = st.checkbox("Enable currency conversion")
 
-dkk_to_target = None
-api_error = False
-exchange_rate_display = None
+if enable_conversion:
+    currency = st.selectbox("Choose currency to convert to:", ["BDT", "USD", "EUR"], index=0)
 
-try:
-    response = requests.get(url)
-    data = response.json()
-    rates = data.get("rates", {})
+    API_KEY = "50c81616ae69471da10d264e01c474cc"
+    url = f"https://api.currencyfreaks.com/latest?apikey={API_KEY}&symbols=BDT,DKK,USD,EUR"
 
-    # Rates are relative to USD from the API, e.g. "BDT": 105.0 means 1 USD = 105 BDT
-    rate_dkk_to_usd = 1 / float(rates.get("DKK", 0)) if rates.get("DKK") else None
-    rate_bdt_to_usd = 1 / float(rates.get("BDT", 0)) if rates.get("BDT") else None
-    rate_usd = 1.0
-    rate_eur_to_usd = 1 / float(rates.get("EUR", 0)) if rates.get("EUR") else None
+    dkk_to_target = None
+    api_error = False
+    exchange_rate_display = None
 
-    if None in [rate_dkk_to_usd, rate_bdt_to_usd, rate_eur_to_usd]:
+    try:
+        response = requests.get(url)
+        data = response.json()
+        rates = data.get("rates", {})
+
+        rate_dkk_to_usd = 1 / float(rates.get("DKK", 0)) if rates.get("DKK") else None
+        rate_bdt_to_usd = 1 / float(rates.get("BDT", 0)) if rates.get("BDT") else None
+        rate_usd = 1.0
+        rate_eur_to_usd = 1 / float(rates.get("EUR", 0)) if rates.get("EUR") else None
+
+        if None in [rate_dkk_to_usd, rate_bdt_to_usd, rate_eur_to_usd]:
+            api_error = True
+        else:
+            if currency == "BDT":
+                dkk_to_target = rate_dkk_to_usd * float(rates.get("BDT"))
+            elif currency == "USD":
+                dkk_to_target = rate_dkk_to_usd
+            elif currency == "EUR":
+                dkk_to_target = rate_dkk_to_usd * float(rates.get("EUR"))
+            exchange_rate_display = dkk_to_target
+    except Exception as e:
         api_error = True
-    else:
+        st.error(f"Error fetching exchange rate: {e}")
+
+    manual_override = st.checkbox("Manually enter exchange rate", value=False)
+    if api_error or manual_override:
+        manual_rate = st.number_input(
+            f"Enter DKK to {currency} exchange rate manually:", 
+            min_value=0.0, format="%.5f"
+        )
+        if manual_rate > 0:
+            dkk_to_target = manual_rate
+            exchange_rate_display = manual_rate
+            st.write(f"**Using manual exchange rate:** 1 DKK = {manual_rate:.5f} {currency}")
+
+    if exchange_rate_display:
+        st.write(f"**Current Exchange Rate:** 1 DKK = {exchange_rate_display:.4f} {currency}")
+
+    if dkk_to_target:
+        gross_converted = gross_salary * dkk_to_target
+        net_converted = net_salary * dkk_to_target
+        tax_converted = (total_tax + other_tax_amount) * dkk_to_target
+
+        st.subheader(f"💵 Converted to {currency}")
         if currency == "BDT":
-            # Convert 1 DKK to USD, then USD to BDT: DKK->USD * USD->BDT
-            dkk_to_target = rate_dkk_to_usd * float(rates.get("BDT"))
-        elif currency == "USD":
-            dkk_to_target = rate_dkk_to_usd
-        elif currency == "EUR":
-            dkk_to_target = rate_dkk_to_usd * float(rates.get("EUR"))
-        exchange_rate_display = dkk_to_target
-except Exception as e:
-    api_error = True
-    st.error(f"Error fetching exchange rate: {e}")
-
-# Show exchange rate if available
-if exchange_rate_display:
-    st.write(f"**Current Exchange Rate:** 1 DKK = {exchange_rate_display:.4f} {currency}")
-
-# Manual override if API failed or user wants to enter rate manually
-manual_override = st.checkbox("Manually enter exchange rate", value=False)
-if api_error or manual_override:
-    manual_rate = st.number_input(
-        f"Enter DKK to {currency} exchange rate manually:", 
-        min_value=0.0, format="%.5f"
-    )
-    if manual_rate > 0:
-        dkk_to_target = manual_rate
-        exchange_rate_display = manual_rate
-        st.write(f"**Using manual exchange rate:** 1 DKK = {manual_rate:.5f} {currency}")
-
-# Show converted amounts if rate is available
-if dkk_to_target:
-    gross_converted = gross_salary * dkk_to_target
-    net_converted = net_salary * dkk_to_target
-    tax_converted = total_tax * dkk_to_target
-
-    st.subheader(f"💵 Converted to {currency}")
-    if currency == "BDT":
-        st.write(f"Gross Income: {format_bdt(gross_converted)} {currency}")
-        st.write(f"Net Income: {format_bdt(net_converted)} {currency}")
-        st.write(f"Total Tax Paid: {format_bdt(tax_converted)} {currency}")
+            st.write(f"Gross Income: {format_bdt(gross_converted)} {currency}")
+            st.write(f"Net Income: {format_bdt(net_converted)} {currency}")
+            st.write(f"Total Tax Paid: {format_bdt(tax_converted)} {currency}")
+        else:
+            st.write(f"Gross Income: {gross_converted:.2f} {currency}")
+            st.write(f"Net Income: {net_converted:.2f} {currency}")
+            st.write(f"Total Tax Paid: {tax_converted:.2f} {currency}")
     else:
-        st.write(f"Gross Income: {gross_converted:.2f} {currency}")
-        st.write(f"Net Income: {net_converted:.2f} {currency}")
-        st.write(f"Total Tax Paid: {tax_converted:.2f} {currency}")
-else:
-    st.info("Exchange rate unavailable or not entered. Please try again later or enter manually.")
+        st.info("Exchange rate unavailable or not entered. Please try again later or enter manually.")
+
+
+
+
+# Holiday pay section
+st.write("---")
+show_holiday = st.checkbox("Show holiday pay calculation")
+
+if show_holiday:
+    # Correct holiday pay is 12.5% of gross salary
+    holiday_brutto = round(gross_salary * 0.125, 2)  # This gives 1514.53 exactly
+    holiday_am = round(holiday_brutto * 0.08, 2)     # 8% AM-bidrag
+    askat_base = holiday_brutto - holiday_am
+    holiday_askat = round(askat_base * 0.38, 2)      # 38% A-skat
+    holiday_net = round(holiday_brutto - holiday_am - holiday_askat, 2)
+
+    st.subheader("🏖️ Holiday Pay Breakdown (in DKK)")
+    st.write(f"Gross Holiday Pay (12.5% of salary): **{holiday_brutto:.2f} DKK**")
+    st.write(f"– AM-bidrag (8%): **{holiday_am:.2f} DKK**")
+    st.write(f"– A-skat (38%): **{holiday_askat:.2f} DKK**")
+    st.write(f"👉 Net Holiday Pay: **{holiday_net:.2f} DKK**")
