@@ -2,6 +2,24 @@ import streamlit as st
 import requests
 import locale
 
+
+st.markdown("""
+<style>
+div.stButton > button:first-child {
+    background-color: #27AE60;  /* green background */
+    color: white;               /* white text */
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 6px;
+    padding: 10px 25px;
+}
+div.stButton > button:first-child:hover {
+    background-color: #219150;  /* darker green on hover */
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 # Set locale for BDT formatting (Bangladesh Numbering System)
 try:
     locale.setlocale(locale.LC_ALL, 'en_IN.UTF-8')
@@ -14,7 +32,22 @@ def format_bdt(amount):
     except:
         return f"{amount:,.2f}"
 
-st.title("Danish Salary Tax Calculator")
+# st.title("Min Løn")
+
+st.markdown(
+    """
+    <h1 style="
+        color: #1E90FF; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        font-weight: 700; 
+        letter-spacing: 4px; 
+        text-align: center; 
+        margin-bottom: 30px;">
+        Min Løn
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
 
 def parse_int_input(value, default=0):
     try:
@@ -168,4 +201,3 @@ if show_holiday:
     st.write(f"– AM-bidrag (8%): **{round(holiday_am):.0f} DKK**")
     st.write(f"– A-skat (38%): **{round(holiday_askat):.0f} DKK**")
     st.write(f"👉 Net Holiday Pay: **{holiday_net:.2f} DKK**")
-
