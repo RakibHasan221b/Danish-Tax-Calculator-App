@@ -6,7 +6,7 @@ import locale
 st.markdown("""
 <style>
 div.stButton > button:first-child {
-    background-color: #27AE60;  /* green background */
+    background-color: #1E90FF;  /* green background */
     color: white;               /* white text */
     font-weight: bold;
     font-size: 18px;
@@ -43,7 +43,7 @@ st.markdown(
         letter-spacing: 4px; 
         text-align: center; 
         margin-bottom: 30px;">
-        MinLøn
+        Min Løn
     </h1>
     """,
     unsafe_allow_html=True
