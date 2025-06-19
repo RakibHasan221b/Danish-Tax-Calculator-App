@@ -102,7 +102,7 @@ if other_tax_percent_input.strip():
 def colored_text(amount, color):
     return f'<p style="font-size:24px; font-weight:bold; color:{color}; margin:0;">{amount:,.2f} DKK</p>'
 
-if st.button("Go"):
+if st.button("Calculate"):
     st.subheader("💰 Salary Breakdown (in DKK)")
     col1, col2, col3 = st.columns(3)
     with col1:
