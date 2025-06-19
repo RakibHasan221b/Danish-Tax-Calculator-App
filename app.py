@@ -198,7 +198,7 @@ if show_holiday:
     holiday_askat = round(askat_base * 0.38)
     holiday_net = round(holiday_brutto - holiday_am - holiday_askat, 2)
     st.subheader("🏖️ Holiday Pay Breakdown (in DKK)")
-    st.write(f"Gross Holiday Pay (12.5% of salary): **{holiday_brutto:.2f} DKK**")
+    st.write(f"Gross Holiday Pay: **{holiday_brutto:.2f} DKK**")
     st.write(f"– AM-bidrag (8%): **{round(holiday_am):.0f} DKK**")
     st.write(f"– A-skat (38%): **{round(holiday_askat):.0f} DKK**")
     st.write(f"👉 Net Holiday Pay: **{holiday_net:.2f} DKK**")
