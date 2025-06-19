@@ -6,7 +6,7 @@ import locale
 st.markdown("""
 <style>
 div.stButton > button:first-child {
-    background-color: #1E90FF;  /* green background */
+    background-color: #1E90FF;  /* Blue background */
     color: white;               /* white text */
     font-weight: bold;
     font-size: 18px;
@@ -14,7 +14,7 @@ div.stButton > button:first-child {
     padding: 10px 25px;
 }
 div.stButton > button:first-child:hover {
-    background-color: #219150;  /* darker green on hover */
+    background-color: #1E90FF;  /* darker blue on hover */
 }
 </style>
 """, unsafe_allow_html=True)
