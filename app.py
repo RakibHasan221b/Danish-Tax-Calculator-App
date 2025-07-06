@@ -77,7 +77,18 @@ if minutes > 59:
 raw_total_hours = hours + (minutes / 60)
 total_hours = round(raw_total_hours * 4) / 4
 
-atp_fixed = 66.00
+# Dynamic ATP based on official brackets
+def calculate_atp(hours):
+    if hours >= 117:
+        return 99.00
+    elif 78 <= hours < 117:
+        return 66.00
+    elif 39 <= hours < 78:
+        return 33.00
+    else:
+        return 0.00
+
+atp_fixed = calculate_atp(raw_total_hours)
 gross_salary = round(total_hours * hourly_rate, 2)
 salary_after_atp = max(0, gross_salary - atp_fixed)
 am_bidrag = round(salary_after_atp * 0.08)
