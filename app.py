@@ -146,6 +146,42 @@ if "gross_salary" in st.session_state:
 
 st.write("---")
 
+show_holiday = st.checkbox("Show Holiday Pay Calculation")
+if show_holiday:
+    holiday_brutto = round(st.session_state.base_gross_salary * 0.125, 2)
+    holiday_am = round(holiday_brutto * 0.08)
+    askat_base = holiday_brutto - holiday_am
+    holiday_askat = round(askat_base * 0.38)
+    holiday_net = round(holiday_brutto - holiday_am - holiday_askat, 2)
+
+    st.subheader("🏖️ Holiday Pay Breakdown (in DKK)")
+    st.write(f"Gross Holiday Pay: **{holiday_brutto:.2f} DKK**")
+    st.write(f"– AM-bidrag (8%): **{round(holiday_am):.0f} DKK**")
+    st.write(f"– A-skat (38%): **{round(holiday_askat):.0f} DKK**")
+    st.write(f"🚪 Net Holiday Pay: **{holiday_net:.2f} DKK**")
+
+st.write("---")    
+
+show_total_with_holiday = st.checkbox("Show Total Salary Including Holiday Pay")
+if show_total_with_holiday and show_holiday:
+    total_gross = round(st.session_state.gross_salary + holiday_brutto, 2)
+    total_tax = round(st.session_state.total_tax + holiday_am + holiday_askat, 2)
+    total_net = round(st.session_state.net_salary + holiday_net, 2)
+
+    st.subheader("🧾 Total Salary Including Holiday Pay")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("### Gross + Holiday")
+        st.markdown(colored_text(total_gross, "#1F618D"), unsafe_allow_html=True)
+    with col2:
+        st.markdown("### Total Tax Paid")
+        st.markdown(colored_text(total_tax, "#A93226"), unsafe_allow_html=True)
+    with col3:
+        st.markdown("### Net + Holiday")
+        st.markdown(colored_text(total_net, "#239B56"), unsafe_allow_html=True)
+
+st.write("---")
+
 enable_conversion = st.checkbox("Enable Currency Conversion")
 
 if enable_conversion:
@@ -219,36 +255,3 @@ if enable_conversion:
         else:
             st.info("Exchange rate unavailable or not entered. Please try again later or enter manually.")
 
-st.write("---")
-
-show_holiday = st.checkbox("Show Holiday Pay Calculation")
-if show_holiday:
-    holiday_brutto = round(st.session_state.base_gross_salary * 0.125, 2)
-    holiday_am = round(holiday_brutto * 0.08)
-    askat_base = holiday_brutto - holiday_am
-    holiday_askat = round(askat_base * 0.38)
-    holiday_net = round(holiday_brutto - holiday_am - holiday_askat, 2)
-
-    st.subheader("🏖️ Holiday Pay Breakdown (in DKK)")
-    st.write(f"Gross Holiday Pay: **{holiday_brutto:.2f} DKK**")
-    st.write(f"– AM-bidrag (8%): **{round(holiday_am):.0f} DKK**")
-    st.write(f"– A-skat (38%): **{round(holiday_askat):.0f} DKK**")
-    st.write(f"🚪 Net Holiday Pay: **{holiday_net:.2f} DKK**")
-
-show_total_with_holiday = st.checkbox("Show Total Salary Including Holiday Pay")
-if show_total_with_holiday and show_holiday:
-    total_gross = round(st.session_state.gross_salary + holiday_brutto, 2)
-    total_tax = round(st.session_state.total_tax + holiday_am + holiday_askat, 2)
-    total_net = round(st.session_state.net_salary + holiday_net, 2)
-
-    st.subheader("🧾 Total Salary Including Holiday Pay")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown("### Gross + Holiday")
-        st.markdown(colored_text(total_gross, "#1F618D"), unsafe_allow_html=True)
-    with col2:
-        st.markdown("### Total Tax Paid")
-        st.markdown(colored_text(total_tax, "#A93226"), unsafe_allow_html=True)
-    with col3:
-        st.markdown("### Net + Holiday")
-        st.markdown(colored_text(total_net, "#239B56"), unsafe_allow_html=True)
