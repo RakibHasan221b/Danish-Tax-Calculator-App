@@ -68,8 +68,9 @@ hours = parse_int_input(hours_input)
 minutes = parse_int_input(minutes_input)
 hourly_rate = parse_float_input(hourly_rate_input)
 tax_deduction = parse_float_input(tax_deduction_input, default=0.0)
-other_tax_percent = parse_float_input(other_tax_percent_input, default=0.0)
 tip = parse_float_input(tip_input, default=0.0)
+other_tax_percent = parse_float_input(other_tax_percent_input, default=0.0)
+
 
 if minutes > 59:
     st.error("Minutes must be between 0 and 59.")
