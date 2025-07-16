@@ -255,5 +255,6 @@ if enable_conversion:
         else:
             st.info("Exchange rate unavailable or not entered. Please try again later or enter manually.")
 
-st.markdown("---")
-st.markdown("© Rakib Hasan 2025")
+st.write("© Rakib Hasan 2025")
+
+
