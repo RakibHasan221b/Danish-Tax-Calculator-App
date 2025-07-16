@@ -255,6 +255,22 @@ if enable_conversion:
         else:
             st.info("Exchange rate unavailable or not entered. Please try again later or enter manually.")
 
-st.write("© Rakib Hasan 2025")
+st.markdown("""
+<style>
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: gray;
+}
+</style>
+
+<div class="footer">
+    © Rakib Hasan 2025
+</div>
+""", unsafe_allow_html=True)
+
 
 
