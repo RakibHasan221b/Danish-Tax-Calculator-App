@@ -1,6 +1,6 @@
 ## This app can calculate your monthly salary bsaed on hours and minutes you have worked in a month.
 Most enterprises and companies in Denmark count months from the date 16-15 Like 16 Jan to 15 Feb and pays the salary on the last of the month like 28 Feb.
-So after your actual month is finished put the hours and minutes in the app and get a proper analysis of what you are gonna receive at the end of the month!
+So after your actual month is finished put the hours, minutes and your tax cut in the app and get a proper analysis of what you are gonna receive at the end of the month!
 
 Now to save you all the hassels to calculate your salaries every month this app is your savior.
 It shows your gross income net income and tax.
